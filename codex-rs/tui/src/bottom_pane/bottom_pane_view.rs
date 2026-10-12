@@ -32,6 +32,11 @@ pub(crate) trait BottomPaneView: Renderable {
         false
     }
 
+    /// Return text to insert into the composer as a draft when the view completes.
+    fn take_composer_insertion(&mut self) -> Option<String> {
+        None
+    }
+
     /// Return the completion reason once the view has finished.
     fn completion(&self) -> Option<ViewCompletion> {
         None

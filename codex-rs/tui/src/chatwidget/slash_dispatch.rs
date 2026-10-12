@@ -168,6 +168,10 @@ impl ChatWidget {
         }
 
         match cmd {
+            SlashCommand::Record => {
+                self.bottom_pane
+                    .show_view(Box::new(crate::bottom_pane::orator::OratorView::start()));
+            }
             SlashCommand::Feedback => {
                 if !self.config.feedback_enabled {
                     let params = crate::bottom_pane::feedback_disabled_params();
@@ -1196,7 +1200,8 @@ impl ChatWidget {
                     QueueDrain::Continue
                 }
             }
-            SlashCommand::Feedback
+            SlashCommand::Record
+            | SlashCommand::Feedback
             | SlashCommand::Export
             | SlashCommand::New
             | SlashCommand::Archive

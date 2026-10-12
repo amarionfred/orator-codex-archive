@@ -40,6 +40,7 @@ pub enum SlashCommand {
     Init,
     Compact,
     Recap,
+    Record,
     Plan,
     Goal,
     Agents,
@@ -88,6 +89,7 @@ impl SlashCommand {
     /// User-visible description shown in the popup.
     pub fn description(self) -> &'static str {
         match self {
+            SlashCommand::Record => "dictate a draft with Orator (local speech to text)",
             SlashCommand::Feedback => "send logs to maintainers",
             SlashCommand::New => "start a new chat during a conversation",
             SlashCommand::Init => "create an AGENTS.md file with instructions for Codex",
@@ -208,7 +210,8 @@ impl SlashCommand {
     /// Whether this command can be run while a task is in progress.
     pub fn available_during_task(self) -> bool {
         match self {
-            SlashCommand::New
+            SlashCommand::Record
+            | SlashCommand::New
             | SlashCommand::Archive
             | SlashCommand::Delete
             | SlashCommand::Fork
@@ -271,6 +274,7 @@ impl SlashCommand {
 
     fn is_visible(self) -> bool {
         match self {
+            SlashCommand::Record => cfg!(target_os = "linux"),
             SlashCommand::SandboxReadRoot => cfg!(target_os = "windows"),
             SlashCommand::Copy => !cfg!(target_os = "android"),
             SlashCommand::App => cfg!(any(target_os = "macos", target_os = "windows")),

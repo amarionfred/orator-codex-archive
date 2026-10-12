@@ -167,6 +167,7 @@ pub(crate) use title_setup::TerminalTitleItem;
 pub(crate) use title_setup::TerminalTitleSetupView;
 #[cfg(test)]
 pub(crate) use title_setup::preview_line_for_title_items;
+pub(crate) mod orator;
 mod paste_burst;
 mod pending_input_preview;
 mod pending_thread_approvals;
@@ -932,6 +933,9 @@ impl BottomPane {
         let needs_redraw = view.pre_draw_tick(now);
         let view_complete = view.is_complete();
         if view_complete {
+            if let Some(text) = view.take_composer_insertion() {
+                self.composer.insert_str(&text);
+            }
             self.view_stack.clear();
             self.on_active_view_complete();
         }

@@ -1,81 +1,68 @@
-<p align="center"><strong>Codex CLI</strong> is a coding agent from OpenAI that runs locally on your computer.
-<p align="center">
-  <img src="https://github.com/openai/codex/blob/main/.github/codex-cli-splash.png" alt="Codex CLI splash" width="80%" />
-</p>
-</br>
-If you want Codex in your code editor (VS Code, Cursor, Windsurf), <a href="https://developers.openai.com/codex/ide">install in your IDE.</a>
-</br>If you want the desktop app experience, run <code>codex app</code> or visit <a href="https://chatgpt.com/codex?app-landing-page=true">the Codex App page</a>.
-</br>If you are looking for the <em>cloud-based agent</em> from OpenAI, <strong>Codex Web</strong>, go to <a href="https://chatgpt.com/codex">chatgpt.com/codex</a>.</p>
+# Orator
 
----
+Local speech to text in Codex CLI. Type `/record`, speak, and press Enter.
+The transcript goes into your draft. Edit it, then send it when you're ready.
+Esc cancels recording or transcription.
 
-## Quickstart
+Orator adds a native recording panel to Codex CLI 0.154.0. Transcription runs
+on your CPU with Whisper. No speech API key is needed, and recordings are deleted
+after transcription. Linux only.
 
-### Installing and running Codex CLI
+## Install
 
-Run the following on Mac or Linux to install Codex CLI:
+Requires Rust, Python 3, `uv`, FFmpeg with PulseAudio support, and a running
+PulseAudio or PipeWire server. The current installer expects Codex CLI 0.154.0
+at `/usr/bin/codex`, installed through the system-wide npm directory
+`/usr/lib/node_modules`. It reuses that installation's code-mode runtime.
 
-```shell
-curl -fsSL https://chatgpt.com/codex/install.sh | sh
+```sh
+git clone https://github.com/amarionfred/orator.git
+cd orator/codex-rs
+cargo +stable build --locked --profile dev-small -p codex-cli --bin codex -j 2
+cd ..
+python3 orator/install.py --activate
 ```
 
-Run the following on Windows to install Codex CLI:
+The first install downloads the speech model. Later recordings work offline.
+Keep `~/.local/bin` before `/usr/bin` in your `PATH`, then open a new `codex` session.
 
-```shell
-powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"
+## Settings
+
+Edit `~/.config/orator/config.toml`:
+
+```toml
+model = "base"
+language = "auto"
+source = "default"
+max_seconds = 180
+cpu_threads = 4
 ```
 
-The standalone installers download from `https://releases.openai.com/codex` by default and fall back to GitHub Releases if a metadata or asset download is unavailable. To force GitHub Releases, set `CODEX_INSTALLER_USE_RELEASES_OPENAI_COM` to `false` (`0` and `no` are also accepted):
+Set `language = "en"` for English. Use `pactl list short sources` to find a
+microphone name for `source`; avoid sources ending in `.monitor`, which capture
+speaker output. If audio clips, lower the microphone volume in your sound settings.
 
-```shell
-curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_INSTALLER_USE_RELEASES_OPENAI_COM=false sh
+The model is stored in `~/.cache/orator/models/base`. The executable and speech
+worker are installed under `~/.local/share/orator`.
+
+## Development
+
+The recording panel lives in `codex-rs/tui/src/bottom_pane/orator.rs`.
+The speech worker and installer are in `orator/`.
+
+With `just` and `cargo-nextest` installed:
+
+```sh
+RUSTUP_TOOLCHAIN=stable env -u NO_COLOR just test -p codex-tui --cargo-profile dev-small
+python3 orator/qa_backend.py --audio /path/to/speech.wav --expect "words in the recording"
 ```
 
-```powershell
-$env:CODEX_INSTALLER_USE_RELEASES_OPENAI_COM='false'; irm https://chatgpt.com/codex/install.ps1 | iex
-```
+The audio check uses a virtual input. It does not record your microphone.
 
-Codex CLI can also be installed via the following package managers:
+## Updates and removal
 
-```shell
-# Install using npm
-npm install -g @openai/codex
-```
+This is a source build based on [Codex CLI 0.154.0](https://github.com/openai/codex/tree/rust-v0.154.0).
+Updating the system Codex package does not update Orator.
+Remove the `~/.local/bin/codex` symlink to return to the system installation.
 
-```shell
-# Install using Homebrew
-brew install --cask codex
-```
-
-Then simply run `codex` to get started.
-
-<details>
-<summary>You can also go to the <a href="https://github.com/openai/codex/releases/latest">latest GitHub Release</a> and download the appropriate binary for your platform.</summary>
-
-Each GitHub Release contains many executables, but in practice, you likely want one of these:
-
-- macOS
-  - Apple Silicon/arm64: `codex-aarch64-apple-darwin.tar.gz`
-  - x86_64 (older Mac hardware): `codex-x86_64-apple-darwin.tar.gz`
-- Linux
-  - x86_64: `codex-x86_64-unknown-linux-musl.tar.gz`
-  - arm64: `codex-aarch64-unknown-linux-musl.tar.gz`
-
-Each archive contains a single entry with the platform baked into the name (e.g., `codex-x86_64-unknown-linux-musl`), so you likely want to rename it to `codex` after extracting it.
-
-</details>
-
-### Using Codex with your ChatGPT plan
-
-Run `codex` and select **Sign in with ChatGPT**. We recommend signing into your ChatGPT account to use Codex as part of your Plus, Pro, Business, Edu, or Enterprise plan. [Learn more about what's included in your ChatGPT plan](https://help.openai.com/en/articles/11369540-codex-in-chatgpt).
-
-You can also use Codex with an API key, but this requires [additional setup](https://developers.openai.com/codex/auth#sign-in-with-an-api-key).
-
-## Docs
-
-- [**Codex Documentation**](https://developers.openai.com/codex)
-- [**Contributing**](./docs/contributing.md)
-- [**Installing & building**](./docs/install.md)
-- [**Open source fund**](./docs/open-source-fund.md)
-
-This repository is licensed under the [Apache-2.0 License](LICENSE).
+[Apache-2.0](LICENSE). See [NOTICE](NOTICE) for upstream attribution.

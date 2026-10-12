@@ -1,0 +1,23 @@
+---
+source: tui/src/bottom_pane/orator_tests.rs
+expression: "screens.join(\"\\n\\n\")"
+---
+
+  Orator · speech to text
+  ● Recording  0:00
+  Transcript goes into your draft for review.
+  enter stop  ·  esc cancel
+
+
+
+  Orator · speech to text
+  Transcribing locally…
+  Transcript goes into your draft for review.
+  esc cancel
+
+
+
+  Orator · speech to text
+  No speech detected.
+  Transcript goes into your draft for review.
+  enter close  ·  esc cancel
