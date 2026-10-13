@@ -10,7 +10,7 @@ after transcription. Linux only.
 
 ## Install
 
-Requires Rust, Python 3, `uv`, FFmpeg with PulseAudio support, and a running
+Requires Rust, Python 3, `uv`, `parecord` (PulseAudio utilities), and a running
 PulseAudio or PipeWire server. The current installer expects Codex CLI 0.154.0
 at `/usr/bin/codex`, installed through the system-wide npm directory
 `/usr/lib/node_modules`. It reuses that installation's code-mode runtime.
@@ -41,6 +41,7 @@ cpu_threads = 4
 Set `language = "en"` for English. Use `pactl list short sources` to find a
 microphone name for `source`; avoid sources ending in `.monitor`, which capture
 speaker output. If audio clips, lower the microphone volume in your sound settings.
+Capture uses only the microphone's first channel, with channel mixing disabled.
 
 The model is stored in `~/.cache/orator/models/base`. The executable and speech
 worker are installed under `~/.local/share/orator`.
@@ -58,6 +59,12 @@ python3 orator/qa_backend.py --audio /path/to/speech.wav --expect "words in the 
 ```
 
 The audio check uses a virtual input. It does not record your microphone.
+It requires FFmpeg with PulseAudio support. To check that the second channel
+stays out of the recording:
+
+```sh
+~/.local/share/orator/venv/bin/python orator/test_capture.py
+```
 
 ## Updates and removal
 
