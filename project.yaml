@@ -1,0 +1,14 @@
+schema: openrig.project/v0alpha1
+kind: project
+id: orator
+metadata:
+  id: orator
+  name: Orator source development
+  description: Codex source checkout with a native recording panel and local Whisper speech-to-text integration.
+install:
+  intent: README.md
+  context:
+  - AGENTS.md
+  skills: []
+missions:
+  root: missions
